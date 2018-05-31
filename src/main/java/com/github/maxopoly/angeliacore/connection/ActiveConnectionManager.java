@@ -60,7 +60,7 @@ public class ActiveConnectionManager {
 				initConnection(conn, true, failed);
 
 			}
-		}, 10, TimeUnit.SECONDS);
+		}, 20, TimeUnit.SECONDS);
 	}
 
 	public ServerConnection getConnection(String playerName) {
@@ -83,24 +83,25 @@ public class ActiveConnectionManager {
 		switch (reason) {
 			case Critial_Exception:
 				conn.getLogger().info("Exiting, because continuing is no longer possible");
-				System.exit(1);
 				break;
 			case Intentional_Disconnect:
 				// whoever called this is expected to tell the user why we are exiting
-				System.exit(0);
+//				System.exit(0);
 				break;
 			case Unknown_Connection_Error:
 				conn.getLogger().info(
 						"Server connection was closed for unknown reasons! Attempting to reconnect in 10 seconds...");
+                                scheduleConnectionReattempt(conn);
 				break;
 			case Server_Disconnected_Intentionally:
 				conn.getLogger().info("Server disconnected us! Attempting to reconnect in 10 seconds...");
+                                scheduleConnectionReattempt(conn);
 				break;
 			case Server_Timed_Out:
 				conn.getLogger().info("Server connection timed out! Attempting to reconnect in 10 seconds...");
+                                scheduleConnectionReattempt(conn);
 				break;
 		}
-		scheduleConnectionReattempt(conn);
 
 	}
 }
